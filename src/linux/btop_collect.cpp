@@ -1013,10 +1013,10 @@ namespace Cpu {
         auto buf = std::string { std::istreambuf_iterator<char> { stream }, {} };
 
         if (buf.empty()) {
-            return std::views::iota(0, Shared::coreCount) | std::ranges::to<std::vector<std::int32_t>>();
+            std::vector<std::int32_t> _v; for(int _i=0; _i<(int)Shared::coreCount; ++_i) _v.push_back(_i); return _v;
         }
 
-        return buf | std::views::split(',') | std::views::transform([](auto&& range) -> auto {
+        auto _rv = buf | std::views::split(',') | std::views::transform([](auto&& range) -> auto {
                    auto view = std::string_view { range };
                    auto dash = view.find('-');
 
@@ -1029,8 +1029,7 @@ namespace Cpu {
                    auto start = to_int(view.substr(0, dash));
                    auto end = to_int(view.substr(dash + 1));
                    return std::views::iota(start, end + 1);
-               }) |
-               std::views::join | std::ranges::to<std::vector<std::int32_t>>();
+               }) | std::views::join; std::vector<std::int32_t> _v; for(auto _i : _rv) _v.push_back(_i); return _v;
     }
 
 	auto collect(bool no_update) -> cpu_info& {
